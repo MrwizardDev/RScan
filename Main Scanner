@@ -1,0 +1,40 @@
+import os
+from signatures import signatures
+
+def scan_file(file_path):
+    try:
+        with open(file_path, 'r', errors='ignore') as file:
+            content = file.read()
+            for name, signature in signatures.items():
+                if signature in content:
+                    return name
+        return None
+    except Exception as e:
+        print(f"Error scanning {file_path}: {e}")
+        return None
+
+def scan_directory(directory):
+    infected_files = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            result = scan_file(file_path)
+            if result:
+                infected_files.append((file_path, result))
+    return infected_files
+
+def main():
+    directory_to_scan = input("Enter the directory to scan: ")
+    print(f"Scanning directory: {directory_to_scan}...")
+
+    infected_files = scan_directory(directory_to_scan)
+    
+    if infected_files:
+        print("Infected files found:")
+        for file_path, malware_name in infected_files:
+            print(f"{file_path}: {malware_name}")
+    else:
+        print("No infected files found.")
+
+if __name__ == "__main__":
+    main()
