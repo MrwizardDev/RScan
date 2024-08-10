@@ -1,0 +1,5 @@
+# signatures.py
+signatures = {
+    "EICAR-Test-File": "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*",
+    # Add more known malware signatures here
+}
