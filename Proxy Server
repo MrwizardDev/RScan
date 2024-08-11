@@ -1,0 +1,31 @@
+pip install requests
+pip install Flask
+
+from flask import Flask, request, Response
+import requests
+
+app = Flask(__name__)
+
+# This function will act as a proxy for the client
+@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def proxy(path):
+    # Extract the requested method (GET, POST, etc.)
+    method = request.method
+    
+    # Full URL to be proxied
+    url = f"http://example.com/{path}"  # Replace with the actual server you want to proxy
+
+    # Forward the headers and data
+    headers = {key: value for key, value in request.headers if key != 'Host'}
+    data = request.get_data()
+
+    # Make the request to the actual server
+    response = requests.request(method, url, headers=headers, data=data, allow_redirects=False)
+
+    # Forward the response from the server back to the client
+    return Response(response.content, status=response.status_code, headers=dict(response.headers))
+
+if __name__ == "__main__":
+    # Run the Flask app
+    app.run(host='0.0.0.0', port=8080)
