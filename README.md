@@ -9,6 +9,7 @@ What we do:
 - Anti-Virus
 - VPN
 - Proxy servers
-- DDos protection
+- DDoS protection
 - Web can protection
-- Malware dectection in websites
+- Malware detection in websites
+- Tips on how you can protect yourself from cyber-attacks and data breaches
