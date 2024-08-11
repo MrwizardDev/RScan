@@ -1,0 +1,41 @@
+pip install Flask
+
+from flask import Flask, request, jsonify
+from collections import defaultdict
+import time
+import os
+
+app = Flask(__name__)
+
+# Track IP request count and timestamps
+ip_access_log = defaultdict(list)
+
+# Configuration: max requests allowed within time frame
+MAX_REQUESTS = 100
+TIME_FRAME = 60  # Time frame in seconds
+
+def block_ip(ip):
+    """Block the IP address using iptables."""
+    print(f"Blocking IP: {ip}")
+    os.system(f"sudo iptables -A INPUT -s {ip} -j DROP")
+
+@app.route('/')
+def index():
+    client_ip = request.remote_addr
+    current_time = time.time()
+
+    # Clean up the log for this IP (remove old requests)
+    ip_access_log[client_ip] = [timestamp for timestamp in ip_access_log[client_ip] if current_time - timestamp < TIME_FRAME]
+
+    # Record the current request
+    ip_access_log[client_ip].append(current_time)
+
+    # Check if this IP has exceeded the request limit
+    if len(ip_access_log[client_ip]) > MAX_REQUESTS:
+        block_ip(client_ip)
+        return jsonify({"error": "Too many requests. You have been blocked."}), 429
+
+    return jsonify({"message": "Request successful"}), 200
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8080)
